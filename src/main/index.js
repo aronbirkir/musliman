@@ -1,6 +1,9 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
+import logger from 'electron-log'
+// import path from 'path'
+// import walkdir from 'walkdir'
 
 /**
  * Set `__static` path to static files in production
@@ -9,6 +12,8 @@ import { app, BrowserWindow } from 'electron'
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
+
+logger.transports.file.level = 'info'
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
@@ -29,10 +34,14 @@ function createWindow () {
 
   mainWindow.on('closed', () => {
     mainWindow = null
+    logger.info('Closing app')
   })
 }
 
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow()
+  logger.info('Ready')
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -43,6 +52,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
+    logger.info('Activate')
   }
 })
 
